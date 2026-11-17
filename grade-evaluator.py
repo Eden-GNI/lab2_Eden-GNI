@@ -88,6 +88,43 @@ def calculate_grades(data):
 
     return total_grade, gpa, formative_points, summative_points
 
+def determine_status(formative_points, summative_points):
+    """
+    Returns (status, formative_pct, summative_pct).
+    Status is 'PASSED' only if BOTH categories are >= 50%.
+    """
+    formative_pct = formative_points / 60 * 100
+    summative_pct = summative_points / 40 * 100
+
+    if formative_pct >= 50 and summative_pct >= 50:
+        status = "PASSED"
+    else:
+        status = "FAILED"
+
+    return status, formative_pct, summative_pct
+
+def find_resubmissions(data):
+    """
+    Returns a list of failed formative assignments (score < 50)
+    that share the highest weight among the failed ones.
+    """
+    failed = []
+    for item in data:
+        if item['group'] == 'Formative' and item['score'] < 50:
+            failed.append(item)
+
+    if not failed:
+        return []
+
+    highest_weight = max(item['weight'] for item in failed)
+
+    resubmit = []
+    for item in failed:
+        if item['weight'] == highest_weight:
+            resubmit.append(item)
+
+    return resubmit
+
 def evaluate_grades(data):
     """
     Implement your logic here.
@@ -102,14 +139,21 @@ def evaluate_grades(data):
 	return
 
     total_grade, gpa, formative_points, summative_points = calculate_grades(data)
+    status, formative_pct, summative_pct = determine_status(formative_points, summative_points)
+    resubmit = find_resubmissions(data)
 
     print(f"Total Grade: {total_grade:.2f}%")
     print(f"GPA: {gpa:.2f}")
-    # TODO: d) Determine Pass/Fail status (>= 50% in BOTH categories)
-    # TODO: e) Check for failed formative assignments (< 50%)
-    #          and determine which one(s) have the highest weight for resubmission.
-    # TODO: f) Print the final decision (PASSED / FAILED) and resubmission options
+    print(f"Formative: {formative_pct:.2f}%")
+    print(f"Summative: {summative_pct:.2f}%")
+    print(f"\nFinal Status: {status}")
 
+    if resubmit:
+        print("\nEligible for resubmission (failed formative with the highest weight):")
+        for item in resubmit:
+            print(f"  - {item['assignment']} (score: {item['score']:.0f}, weight: {item['weight']:.0f})")
+    else:
+        print("\nNo failed formative assignments. No resubmission needed.")
 
 if __name__ == "__main__":
     # 1. Load the data
