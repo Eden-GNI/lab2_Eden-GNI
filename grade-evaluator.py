@@ -114,7 +114,7 @@ def find_resubmissions(data):
             failed.append(item)
 
     if not failed:
-        return []
+      return []
 
     highest_weight = max(item['weight'] for item in failed)
 
@@ -126,17 +126,14 @@ def find_resubmissions(data):
     return resubmit
 
 def evaluate_grades(data):
-    """
-    Implement your logic here.
-    'data' is a list of dictionaries containing the assignment records.
-    """
+
     print("\n--- Processing Grades ---")
 
     if not validate_scores(data):
-	  return
+      return
 
     if not validate_weights(data):
-	return
+      return
 
     total_grade, gpa, formative_points, summative_points = calculate_grades(data)
     status, formative_pct, summative_pct = determine_status(formative_points, summative_points)
